@@ -1,0 +1,4 @@
+1. Importar la base de datos "iadb" en MySQL
+2. Para desplegar el proyecto se ejecuta el archivo "app.py"
+3. Se puede usar las imágenes de la carpeta "test" para probar la página web
+4. Para usar la integración con el bot de telegram se ejecuta el archivo "telegram.py", se debe de cambiar el "TOKEN" del bot de telegram existente por el del personal.

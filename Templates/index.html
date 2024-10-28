@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Autos Autonomos Clasificador</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>
+        .center-block {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .center-text {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 class="jumbotron bg-primary text-center"> Clasificador de Autos Autónomos</h1>
+        <br><br>
+        <form class="form-horizontal" action="/submit" method="post" enctype="multipart/form-data" id="imageForm">
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="image">Sube tu imágen:</label>
+                <div class="col-sm-10">
+                    <input type="file" class="form-control" name="image" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-success">Subir</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="center-text">
+            <div id="result">
+                {% if Prediction %}
+                <h2> Imagen Detectada: <i> {{Prediction}} </i></h2>
+                <img src="{{ img_name }}" class="center-block" height="512px" width="512px">
+                {% else %}
+                <h2> Imagen Detectada: <i> {{Prediction}} </i></h2>
+                {% endif %}
+            
+                <h2>Clases Detectadas:</h2>
+                <ul id="classesDetected" class="list-unstyled center-block"></ul>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                $('#imageForm').on('submit', function (event) {
+                    event.preventDefault(); // Evitar envío automático del formulario
+        
+                    var formData = new FormData($('#imageForm')[0]);
+        
+                    // Enviar la imagen al servidor
+                    $.ajax({
+                        type: 'POST',
+                        url: '/submit',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            var detectedImagePath = response.detected_img_path + '?t=' + new Date().getTime();
+                            var numClassesDetected = response.num_classes_detected;
+                            var classesCount = response.classes_count;
+        
+                            // Mostrar la imagen detectada con los cuadros delimitadores y la cantidad de clases detectadas
+                            $('#result').html('<h2> Imagen Detectada: <i> {{Prediction}} </i></h2>' +
+                                '<img src="' + detectedImagePath + '" class="center-block" height="512px" width="512px">' +
+                                '<h2>Clases Detectadas:</h2><ul id="classesDetected" class="list-unstyled center-block"></ul>');
+        
+                            // Mostrar la cantidad de cada clase detectada
+                            Object.keys(classesCount).forEach(function (key) {
+                                $('#classesDetected').append('<li>' + key + ': ' + classesCount[key] + '</li>');
+                            });
+                        },
+                        error: function (error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                });
+            });
+        </script>
+    </div>
+
+</body>
+
+</html>
